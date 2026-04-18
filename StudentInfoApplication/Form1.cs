@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
-
 namespace StudentInfoApplication
 {
-    public partial class Form1 : Form
+    public partial class FrmStudentInfo : Form
     {
-        public Form1()
+        private int totalStudents = 0;
+        public FrmStudentInfo()
         {
             InitializeComponent();
         }
@@ -54,7 +48,39 @@ namespace StudentInfoApplication
 
         private void button1_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (txtStudentID.Text.Trim() == "" || txtFirstName.Text.Trim() == "" || txtLastName.Text.Trim() == "")
+                    throw new ArgumentException("All fields are required. Please fill in Student ID, First Name, and Last Name.");
 
+                if (!Regex.IsMatch(txtStudentID.Text.Trim(), @"^\d+$"))
+                    throw new FormatException("Student ID must contain numbers only.");
+
+                if (txtStudentID.Text.Trim().Length != 11)
+                    throw new ArgumentOutOfRangeException("Student ID must be exactly 11 digits.");
+
+                if (!Regex.IsMatch(txtFirstName.Text.Trim(), @"^[a-zA-Z\s]+$") ||
+                    !Regex.IsMatch(txtLastName.Text.Trim(), @"^[a-zA-Z\s]+$"))
+                    throw new FormatException("First Name and Last Name must contain letters only.");
+
+
+                var student = new Student(txtStudentID.Text.Trim(), txtFirstName.Text.Trim(), txtLastName.Text.Trim());
+
+                lstStudentID.Items.Add(student.StudentID);
+                lstFirstName.Items.Add(student.FirstName);
+                lstLastName.Items.Add(student.LastName);
+
+                totalStudents++;
+                label7.Text = "Total Student: " + totalStudents;
+
+                txtStudentID.Clear();
+                txtFirstName.Clear();
+                txtLastName.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
